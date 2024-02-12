@@ -7,6 +7,8 @@ import CreateAccount from "./routes/create-account"
 import { useEffect, useState } from "react"
 import LoadingScreen from "./components/loading-screen"
 import { auth } from "./routes/firebase"
+import styled from "styled-components"
+
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,15 @@ const router = createBrowserRouter([
 }
 ])
 
+/**
+ * 전체 높이 100% & 가운데 정렬
+ */
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const init = async () => {
@@ -48,9 +59,9 @@ function App() {
     init()
   }, [])
   return (
-    <>
+    <Wrapper>
       {isLoading ? <LoadingScreen/> : <RouterProvider router={router}/>}
-    </>
+    </Wrapper>
   )
 }
 
