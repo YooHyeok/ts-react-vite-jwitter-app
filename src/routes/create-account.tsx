@@ -1,5 +1,8 @@
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import styled from "styled-components"
+import { auth } from "./firebase"
+import { useNavigate } from "react-router-dom"
 
 const Wrapper = styled.div`
   height: 100%;
@@ -37,6 +40,7 @@ const Error = styled.span`
   color: tomato;
 `
 export default function CreateAccount() {
+  const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
 
   const [name, setName] = useState("")
@@ -55,15 +59,22 @@ export default function CreateAccount() {
     }
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if(isLoading || name === "" || email === "" || password === "") return;
     try {
+      setLoading(true)
       // 계정 생성
+      const credentials = await createUserWithEmailAndPassword(auth, email, password) //인증객체, 이메일, 패스워드 FireBase에 전달 -> 인증성공시 자격증명 반환
+      console.log(credentials.user)
       // 사용자 프로필이름 지정
+      await updateProfile(credentials.user, {displayName: name,})
       // 홈페이지 리다이렉트
+      navigate("/")
     } catch (e) {
       // setError
-    } finally {
+      console.log(e)
+    } finally { // navigate에 의해 리다이렉트 되었더라도 무조건 실행된다.
       setLoading(false)
     }
     console.log(name, email, password)
@@ -71,7 +82,7 @@ export default function CreateAccount() {
 
   return (
   <Wrapper>
-    <Title>Log into❌</Title>
+    <Title>Join ❌</Title>
     <Form onSubmit={onSubmit}>
       <Input onChange={onChange} name="name" value={name} placeholder="Name" type="text" required/>
       <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
