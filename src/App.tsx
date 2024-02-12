@@ -4,7 +4,9 @@ import Home from "./routes/home"
 import Profile from "./routes/profile"
 import Login from "./routes/login"
 import CreateAccount from "./routes/create-account"
-
+import { useEffect, useState } from "react"
+import LoadingScreen from "./components/loading-screen"
+import { auth } from "./routes/firebase"
 
 const router = createBrowserRouter([
   {
@@ -31,13 +33,23 @@ const router = createBrowserRouter([
 }
 ])
 
-
-
 function App() {
-
+  const [isLoading, setIsLoading] = useState(true);
+  const init = async () => {
+    /**
+     * 인증준비 대기 (인증완료시 promise리턴) 
+     * Firebase가 쿠기와 토큰을 읽고 백엔드와 소통해서 로그인여부를 확인하는 동안 대기한다.
+     */
+    const result = await auth.authStateReady();
+    // firebase 인증 대기
+    setIsLoading(false);
+  }
+  useEffect(()=> {
+    init()
+  }, [])
   return (
     <>
-      <RouterProvider router={router}/>
+      {isLoading ? <LoadingScreen/> : <RouterProvider router={router}/>}
     </>
   )
 }
