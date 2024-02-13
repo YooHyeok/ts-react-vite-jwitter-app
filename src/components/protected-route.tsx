@@ -1,7 +1,5 @@
 import { Navigate } from "react-router-dom"
 import { auth } from "../routes/firebase"
-import { useEffect } from "react";
-
 
 /**
  * 로그인 한 사용자가 보게 될 컴포넌트
