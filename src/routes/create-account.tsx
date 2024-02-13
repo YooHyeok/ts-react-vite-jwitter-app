@@ -2,7 +2,8 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { useState } from "react"
 import styled from "styled-components"
 import { auth } from "./firebase"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { FirebaseError } from "firebase/app"
 
 const Wrapper = styled.div`
   height: 100%;
@@ -17,6 +18,7 @@ const Title = styled.h1`
 `
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column; /* flex 컨테이너내 아이템 배치 (input들을 column형태로 정렬) */
   gap: 10px;
@@ -38,6 +40,12 @@ const Input = styled.input`
 const Error = styled.span`
   font-weight: 600;
   color: tomato;
+`
+const Switcher = styled.span`
+  margin-top: 20px;
+  a {
+    color: #1d9bf0;
+  }
 `
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -61,6 +69,7 @@ export default function CreateAccount() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("")
     if(isLoading || name === "" || email === "" || password === "") return;
     try {
       setLoading(true)
@@ -69,11 +78,14 @@ export default function CreateAccount() {
       console.log(credentials.user)
       // 사용자 프로필이름 지정
       await updateProfile(credentials.user, {displayName: name,})
-      // 홈페이지 리다이렉트
+      // 회원가입 성공시 홈페이지 리다이렉트
       navigate("/")
     } catch (e) {
       // setError
-      console.log(e)
+      if(e instanceof FirebaseError) { // 회원가입 실패시
+        console.log(e.code, e.message)
+        setError(e.message)
+      }
     } finally { // navigate에 의해 리다이렉트 되었더라도 무조건 실행된다.
       setLoading(false)
     }
@@ -90,6 +102,9 @@ export default function CreateAccount() {
       <Input onChange={onChange} type="submit" value={isLoading ? "Loading...." : "Create Account"}/>
     </Form>
     {error !== "" ? <Error>{error}</Error>: null}
+    <Switcher>
+      Already have an account?{" "}<Link to="/login">Log in &rarr;</Link>
+    </Switcher>
   </Wrapper>
   )
 }
