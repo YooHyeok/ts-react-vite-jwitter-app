@@ -1,6 +1,8 @@
 import { GithubAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth"
 import {styled} from "styled-components"
 import { auth } from "../routes/firebase"
+import { Error } from "./auth-styled"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { FirebaseError } from "firebase/app"
@@ -28,22 +30,30 @@ const Logo = styled.img`
 `
 export default function GithubButton() {
   const navigate = useNavigate();
+  const [error, setError] = useState("")
 
   const onClick = async() => {
     try {
+      setError("")
       const provider = new GithubAuthProvider()
       await signInWithPopup(auth, provider); // 팝업
       // await signInWithRedirect(auth, provider); // 페이지로이동
       navigate("/")
     } catch (e) {
-      console.log(e)
+      if(e instanceof FirebaseError) { // 로그인 실패시
+        console.log(e.code, e.message)
+        setError(e.message)
+      }
     }
   }
 
   return (
+    <>
     <Button onClick={onClick}>
       <Logo src="/github-logo.svg" />
       Contiune with Github
     </Button>
+    {error !== "" ? <Error>{error}</Error>: null}
+    </>
     )
 }
