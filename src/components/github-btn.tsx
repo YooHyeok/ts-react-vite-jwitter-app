@@ -1,4 +1,9 @@
+import { GithubAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth"
 import {styled} from "styled-components"
+import { auth } from "../routes/firebase"
+import { useNavigate } from "react-router-dom"
+
+import { FirebaseError } from "firebase/app"
 
 const Button = styled.span`
   margin-top: 50px;
@@ -22,9 +27,21 @@ const Logo = styled.img`
   height: 25px;
 `
 export default function GithubButton() {
+  const navigate = useNavigate();
+
+  const onClick = async() => {
+    try {
+      const provider = new GithubAuthProvider()
+      await signInWithPopup(auth, provider); // 팝업
+      // await signInWithRedirect(auth, provider); // 페이지로이동
+      navigate("/")
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
-    <Button >
+    <Button onClick={onClick}>
       <Logo src="/github-logo.svg" />
       Contiune with Github
     </Button>
