@@ -1,7 +1,8 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import styled from "styled-components"
-import { auth, db } from "../routes/firebase";
+import { auth, db, storage } from "../routes/firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -85,13 +86,21 @@ export default function PostTweetForm() {
     try {
       setIsLoading(true)
       const dbCollection = collection(db, "tweets"); // collection(): Fire Store로부터 tweets 컬렉션 반환
-      await addDoc(dbCollection, {// addDoc(): Fire Store에 새로운 Document 생성함수 - 생성할 컬렉션, 필드 및 데이터 추가
+      const doc = await addDoc(dbCollection, {// addDoc(): Fire Store에 새로운 Document 생성함수 - 생성할 컬렉션, 필드 및 데이터 추가
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous", // 닉네임이 존재하지 않으면 Anonymous 반환
         userId: user.uid // 트윗을 삭제하기 위한 작성자와 로그인한 userid일치여부
 
       }) 
+      if(file) {
+        const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`)//파일에 대한 저장 위치
+        const result = await uploadBytes(locationRef, file); //저장위치와 파일을 매개변수로 담아 Byte로 변환하여 저장한다.
+        const url = await getDownloadURL(result.ref);
+        updateDoc(doc, {photo:url}) // 저장한 file URL을 저장되었던 Document에 다시 저장
+      }
+      setTweet("")
+      setFile(null)
     } catch(e) {
       console.log(e)
     } finally {
@@ -99,7 +108,7 @@ export default function PostTweetForm() {
     }
   }
   return <Form onSubmit={onSubmit}>
-    <TextArea rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?"/>
+    <TextArea required rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?"/>
     <AttachFileButton  htmlFor="file" >{file? "Photo added" : "Add photo"}</AttachFileButton>
     <AttachFileInput onChange={onFileChange} type="file" id="file" accept="image/*"/>
     <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Tweet"}/>
