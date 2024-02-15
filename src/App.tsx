@@ -9,6 +9,7 @@ import LoadingScreen from "./components/loading-screen"
 import { auth } from "./routes/firebase"
 import styled from "styled-components"
 import ProtectedRoute from "./components/protected-route"
+import { GlobalStyled } from "./components/global-styled"
 
 
 const router = createBrowserRouter([
@@ -65,6 +66,7 @@ function App() {
   }, [])
   return (
     <Wrapper>
+      <GlobalStyled/>
       {isLoading ? <LoadingScreen/> : <RouterProvider router={router}/>}
     </Wrapper>
   )
