@@ -94,7 +94,8 @@ export default function PostTweetForm() {
 
       }) 
       if(file) {
-        const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`)//파일에 대한 저장 위치
+        // const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`)//파일에 대한 저장 위치
+        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`)//파일에 대한 저장 위치
         const result = await uploadBytes(locationRef, file); //저장위치와 파일을 매개변수로 담아 Byte로 변환하여 저장한다.
         const url = await getDownloadURL(result.ref);
         updateDoc(doc, {photo:url}) // 저장한 file URL을 저장되었던 Document에 다시 저장
