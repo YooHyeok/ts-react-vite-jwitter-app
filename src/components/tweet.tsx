@@ -34,16 +34,40 @@ const DeleteButton = styled.button`
   background-color: tomato;
   color: white;
   font-weight: 600;
-  border: 0;
+  border: 1px solid tomato;
   font-size: 12px;
   padding: 5px 10px;
   text-transform: uppercase;
   border-radius: 5px;
   cursor: pointer;
+  &:hover,
+  &:active {
+    opacity: 0.9;
+  }
+  `
+
+const UpdateButton = styled.label`
+  color: tomato;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  border: 1px solid tomato;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    opacity: 0.9;
+  }
 `
 
 export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const user = auth.currentUser;
+
+  const onUpdate = () => {
+    alert("수정버튼 클릭됨")
+  }
+
   const onDelete = async() => {
     const ok = confirm("Are you sure you want to delete this?")
     if(!ok || user?.uid !== userId) return;
@@ -59,12 +83,14 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
       // ToDos..
     }
   }
+
   return(
     <Wrapper>
       <Column>
         <Username>{username}</Username>
         <Payload>{tweet}</Payload>
-        {user?.uid === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
+        {user?.uid === userId ? <UpdateButton onClick={onUpdate}>Update</UpdateButton> : null}
+        &nbsp; {user?.uid === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
       </Column>
       {photo? <Column>
         <Photo src={photo}/>
