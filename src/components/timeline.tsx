@@ -6,7 +6,7 @@ import Tweet from "./tweet";
 import { Unsubscribe } from "firebase/auth";
 
 export interface ITweet {
-  id: string;
+  docId: string;
   photo?: string; //사진은 필수가 아니므로 ?처리
   tweet: string;
   userId: string;
@@ -46,7 +46,7 @@ export default function Timeline() {
           userId,
           username,
           createdAt,
-          id: doc.id
+          docId: doc.id
         };
       })
   }
@@ -82,6 +82,6 @@ export default function Timeline() {
     }
   }, [])
   return <Wrapper>
-    {tweets.map(tweet=><Tweet key={tweet.id} {...tweet}/>)}
+    {tweets.map(tweet=><Tweet key={tweet.docId} {...tweet}/>)}
   </Wrapper>
 }
