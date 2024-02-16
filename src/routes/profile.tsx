@@ -1,8 +1,9 @@
 import styled from "styled-components"
 import { auth, storage } from "./firebase"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { updateProfile } from "firebase/auth"
+import { Error } from "../components/auth-styled"
 
 const Wrapper = styled.div`
   display: flex;
@@ -51,6 +52,7 @@ const DefaultAvatarBtn = styled.label`
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [error, setError] = useState("")
 
   const onAvatarChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
 
@@ -67,7 +69,22 @@ export default function Profile() {
     }
   }
 
+  /**
+   * 삭제 후 출력되는 메시지 3초후 제거
+   */
+  useEffect(()=>{
+    if(error!="") {
+      setTimeout(()=>{
+        setError("")
+      }, 3000)
+    }
+  }, [error])
+
   const onDefaultAvatar = async () => {
+    if(avatar == null) {
+      setError("Already Default Avartar.. you need Change Avatar..")
+      return;
+    }
     if(user) {
       setAvatar(null)
       const photoRef = ref(storage,  `avatars/${user?.uid}`)
@@ -84,6 +101,7 @@ export default function Profile() {
     </AvatarUpload>
     <AvatarInput onChange={onAvatarChange} id="profile" type="file" accept="image/*"/>
     <DefaultAvatarBtn onClick={onDefaultAvatar}>Change Default Avartar</DefaultAvatarBtn>
+    {error !== "" ? <Error>{error}</Error>: null}
     <Name>
       {user?.displayName ?? "Anonymous"}
     </Name>
