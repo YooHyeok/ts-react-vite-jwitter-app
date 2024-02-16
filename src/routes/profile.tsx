@@ -3,18 +3,33 @@ import { auth } from "./firebase"
 import { useState } from "react"
 
 const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
 `
 const AvatarUpload = styled.label`
-  
+  width: 80px;
+  overflow: hidden;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #1d9bf0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 50px;
+  }
 `
 const AvatarImg = styled.img`
-  
+  width: 100%;
 `
 const AvatarInput = styled.input`
   display: none;
 `
 const Name = styled.span`
-  
+  font-size: 22px;
 `
 export default function Profile() {
   const user = auth.currentUser;
