@@ -3,6 +3,7 @@ import { ITweet } from "./timeline";
 import { auth, db, storage } from "../routes/firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import { useState } from "react";
 
 const Wrapper = styled.div`
   display: grid;
@@ -12,11 +13,21 @@ const Wrapper = styled.div`
   border-radius: 15px;
 `;
 
-const Column = styled.div``;
+const Column1 = styled.div`
+`;
+const Column2 = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+`;
 
 const Photo = styled.img`
-  width: 100px;
-  height: 100px;
+/* position: relative;
+  top:20px; */
+  margin-top: 25px;
+  width: 115px;
+  height: 115px;
   border-radius: 15px;
 `;
 
@@ -27,10 +38,11 @@ const Username = styled.span`
 
 const Payload = styled.p`
   margin: 10px 0px;
+  min-height: 40px;
   font-size: 18px;
 `;
 
-const DeleteButton = styled.button`
+const FilledButton = styled.button`
   background-color: tomato;
   color: white;
   font-weight: 600;
@@ -46,7 +58,47 @@ const DeleteButton = styled.button`
   }
   `
 
-const UpdateButton = styled.label`
+const LinedButton = styled.label`
+  color: tomato;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  border: 1px solid tomato;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    opacity: 0.9;
+  }
+`
+
+const TextArea = styled.textarea`
+  border: 2px solid white;
+  padding: 5px;
+  margin: 10px 0px;
+  min-height: 40px;
+  height: 100%;
+  max-height: 106px;
+  border-radius: 20px;
+  font-size: 17.5px;
+  color: white;
+  background-color: black;
+  width: 100%;
+  resize: none;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  &::placeholder {
+    font-size: 16px;
+  }
+  &:focus {
+    outline: none;
+    border-color: #1d9bf0;
+  }
+`;
+
+
+const EditPhotoBtn = styled.label`
   color: tomato;
   font-weight: 600;
   font-size: 12px;
@@ -63,9 +115,15 @@ const UpdateButton = styled.label`
 
 export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const user = auth.currentUser;
-
+  const [updateMode, setUpdateMode] = useState(false);
   const onUpdate = () => {
-    alert("수정버튼 클릭됨")
+    setUpdateMode(true);
+  }
+  const onCancel = () => {
+    setUpdateMode(false);
+  }
+  const onSubmit = () => {
+    setUpdateMode(false);
   }
 
   const onDelete = async() => {
@@ -86,15 +144,28 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
 
   return(
     <Wrapper>
-      <Column>
+      <Column1>
         <Username>{username}</Username>
+        {updateMode ? 
+        <>
+        <TextArea required rows={5} maxLength={180} value={tweet} placeholder="What is happening?"/>
+        <LinedButton onClick={onCancel}>Cancel</LinedButton>&nbsp; 
+        <FilledButton onClick={onSubmit}>Submit</FilledButton>
+        </>
+        :
+        <>
         <Payload>{tweet}</Payload>
-        {user?.uid === userId ? <UpdateButton onClick={onUpdate}>Update</UpdateButton> : null}
-        &nbsp; {user?.uid === userId ? <DeleteButton onClick={onDelete}>Delete</DeleteButton> : null}
-      </Column>
-      {photo? <Column>
+        {user?.uid === userId ? <LinedButton onClick={onUpdate}>Update</LinedButton> : null}&nbsp; 
+        {user?.uid === userId ? <FilledButton onClick={onDelete}>Delete</FilledButton> : null}
+        </>
+        }
+      </Column1>
+      {photo? 
+      <Column2>
         <Photo src={photo}/>
-      </Column> : null}
+        {updateMode ? <EditPhotoBtn>Edit</EditPhotoBtn> : null}
+      </Column2> 
+      : null}
     </Wrapper>
   );
 }
