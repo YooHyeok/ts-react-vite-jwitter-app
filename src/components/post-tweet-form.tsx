@@ -8,6 +8,7 @@ import { Error } from "./auth-styled";
 const Form = styled.form`
   display: flex;
   flex-direction: column;
+  text-align: center;
   gap: 10px;
 `;
 
