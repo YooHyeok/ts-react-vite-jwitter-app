@@ -1,5 +1,5 @@
 import { addDoc, collection, updateDoc } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components"
 import { auth, db, storage } from "../routes/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -70,6 +70,14 @@ export default function PostTweetForm() {
   const [tweet, setTweet] = useState("");
   const [file, setFile] = useState<File|null>(null);
   const [fileError, setFileError] = useState("");
+
+  useEffect(()=>{
+    if(fileError !== ""){
+      setTimeout(()=>{
+        setFileError("")
+      }, 5000)
+    } 
+  }, [fileError])
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTweet(e.target.value)
