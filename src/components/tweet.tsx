@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { auth, db, storage } from "../routes/firebase";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 
@@ -137,8 +137,6 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
     setEditTweet(e.target.value)
   }
 
-
-
   const onDelete = async() => {
     const ok = confirm("Are you sure you want to delete this?")
     if(!ok || user?.uid !== userId) return;
@@ -155,7 +153,21 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
     }
   }
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(e)
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || editTweet === "" || editTweet.length > 180) return;
+
+    try {
+      const tweetRef = doc(db, "tweets", docId);
+      await updateDoc(tweetRef, {
+        tweet: editTweet,
+      });
+      setEditTweet("");
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setUpdateMode(false);
+    }
   }
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e)
