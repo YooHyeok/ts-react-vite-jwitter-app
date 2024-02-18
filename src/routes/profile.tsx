@@ -6,6 +6,7 @@ import { updateProfile } from "firebase/auth"
 import { Error } from "../components/auth-styled"
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
 import { ITweet } from "../components/timeline"
+import Tweet from "../components/tweet"
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,6 +51,12 @@ const DefaultAvatarBtn = styled.label`
   &:active {
     opacity: 0.9;
   }
+`
+const Tweets = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: scroll;
 `
 
 export default function Profile() {
@@ -139,6 +146,9 @@ export default function Profile() {
     <Name>
       {user?.displayName ?? "Anonymous"}
     </Name>
+    <Tweets>
+      {tweets.map(tweet=> <Tweet key={tweet.docId} {...tweet}/>)}
+    </Tweets>
   </Wrapper>
 }
 function DefaultAvatar() {
