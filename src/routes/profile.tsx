@@ -1,9 +1,11 @@
 import styled from "styled-components"
-import { auth, storage } from "./firebase"
+import { auth, db, storage } from "./firebase"
 import { useEffect, useState } from "react"
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { updateProfile } from "firebase/auth"
 import { Error } from "../components/auth-styled"
+import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { ITweet } from "../components/timeline"
 
 const Wrapper = styled.div`
   display: flex;
@@ -49,13 +51,14 @@ const DefaultAvatarBtn = styled.label`
     opacity: 0.9;
   }
 `
+
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [error, setError] = useState("")
+  const [tweets, setTweets] = useState<ITweet[]>([])
 
   const onAvatarChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
-
     const {files} = e.target
 
     if(user && files && files.length === 1) {
@@ -68,6 +71,39 @@ export default function Profile() {
       await updateProfile(user, {photoURL})
     }
   }
+
+  /**
+   * 내가 쓴 Tweet 조회
+   * 콘솔 오류 출력 링크로 이동하여 색인을 저장한다.
+   * 우리가 필터링에 사용한 필터들을 파이어베이스에 직접 알려줘야 한다.
+   */
+  const fetchTweet = async () => {
+
+    const tweetQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    )
+    const snapshot = await getDocs(tweetQuery);
+    const tweets = snapshot.docs.map(doc => {
+      const {tweet, createdAt, userId, username, photo} = doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        username,
+        photo,
+        docId: doc.id
+      }
+    })
+    setTweets(tweets)
+  }
+
+  useEffect(()=> {
+    fetchTweet();
+  }, [])
+
 
   /**
    * 삭제 후 출력되는 메시지 3초후 제거
