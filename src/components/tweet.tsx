@@ -73,6 +73,13 @@ const LinedButton = styled.label`
   }
 `
 
+const Form = styled.form`
+/*   display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 10px; */
+`;
+
 const TextArea = styled.textarea`
   border: 2px solid white;
   padding: 5px;
@@ -98,7 +105,7 @@ const TextArea = styled.textarea`
 `;
 
 
-const EditPhotoBtn = styled.label`
+const EditPhotoBtn = styled.input`
   color: tomato;
   font-weight: 600;
   font-size: 12px;
@@ -116,15 +123,21 @@ const EditPhotoBtn = styled.label`
 export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const user = auth.currentUser;
   const [updateMode, setUpdateMode] = useState(false);
+
+  const [editTweet, setEditTweet] = useState(tweet);
+
   const onUpdate = () => {
     setUpdateMode(true);
   }
   const onCancel = () => {
     setUpdateMode(false);
   }
-  const onSubmit = () => {
-    setUpdateMode(false);
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditTweet(e.target.value)
   }
+
+
 
   const onDelete = async() => {
     const ok = confirm("Are you sure you want to delete this?")
@@ -141,17 +154,22 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
       // ToDos..
     }
   }
-
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log(e)
+  }
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e)
+  }
   return(
     <Wrapper>
       <Column1>
         <Username>{username}</Username>
         {updateMode ? 
-        <>
-        <TextArea required rows={5} maxLength={180} value={tweet} placeholder="What is happening?"/>
+        <Form onSubmit={onSubmit}>
+        <TextArea required rows={5} maxLength={180} value={editTweet} onChange={onChange} placeholder="What is happening?"/>
         <LinedButton onClick={onCancel}>Cancel</LinedButton>&nbsp; 
-        <FilledButton onClick={onSubmit}>Submit</FilledButton>
-        </>
+        <FilledButton>Submit</FilledButton>
+        </Form>
         :
         <>
         <Payload>{tweet}</Payload>
@@ -163,7 +181,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
       {photo? 
       <Column2>
         <Photo src={photo}/>
-        {updateMode ? <EditPhotoBtn>Edit</EditPhotoBtn> : null}
+        {updateMode ? <EditPhotoBtn onChange={onFileChange}>Edit</EditPhotoBtn> : null}
       </Column2> 
       : null}
     </Wrapper>
