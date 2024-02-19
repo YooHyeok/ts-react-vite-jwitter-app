@@ -2,9 +2,9 @@ import styled from "styled-components"
 import { auth, db, storage } from "./firebase"
 import { useEffect, useState } from "react"
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
-import { updateProfile } from "firebase/auth"
+import { Unsubscribe, updateProfile } from "firebase/auth"
 import { Error } from "../components/auth-styled"
-import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "firebase/firestore"
+import { DocumentData, QuerySnapshot, collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore"
 import { ITweet } from "../components/timeline"
 import Tweet from "../components/tweet"
 
@@ -101,7 +101,7 @@ export default function Profile() {
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [error, setError] = useState("")
   const [tweets, setTweets] = useState<ITweet[]>([])
-  const [nickname, setNickname] = useState(user?.displayName)
+  const [nickname, setNickname] = useState<string|null|undefined>(user?.displayName)
   const [isNickEdit, setIsNickEdit] = useState(false)
   const onAvatarChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
     const {files} = e.target
@@ -225,14 +225,14 @@ export default function Profile() {
 
   return <Wrapper>
     <AvatarUpload htmlFor="profile">
-      {Boolean(avatar)? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
+      {avatar? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
     </AvatarUpload>
     <AvatarInput onChange={onAvatarChange} id="profile" type="file" accept="image/*"/>
     <DefaultAvatarBtn onClick={onDefaultAvatar}>Change Default Avartar</DefaultAvatarBtn>
     {error !== "" ? <Error>{error}</Error>: null}
     <div style={{display: "flex"}}>
     {isNickEdit ? 
-    <Input onChange={onNickChange} value={nickname} placeholder={"변경할 닉네임 입력"} maxLength={15} minLength={1}/>
+    <Input onChange={onNickChange} value={nickname as string} placeholder={"변경할 닉네임 입력"} maxLength={15} minLength={1}/>
     :
     <Name>{user?.displayName ?? "Anonymous"}</Name>
     }

@@ -94,7 +94,7 @@ export default function PostTweetForm() {
   const [tweet, setTweet] = useState("");
   const [file, setFile] = useState<File|null>(null);
   const [fileError, setFileError] = useState("");
-  const [photo, setPhoto] = useState<string|null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
 
   useEffect(()=>{
     if(fileError !== ""){
@@ -120,7 +120,7 @@ export default function PostTweetForm() {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = (e:ProgressEvent<FileReader>) => {
-        setPhoto(e.target?.result);
+        setPhoto((e.target?.result as string | null) ?? null);
       }
     }
   }

@@ -162,7 +162,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const [updateMode, setUpdateMode] = useState(false);
   const [editTweet, setEditTweet] = useState(tweet);
   const [editFile, setEditFile] = useState<File|null>(null)
-  const [editPhoto, setEditPhoto] = useState<string|null|undefined>(photo)
+  const [editPhoto, setEditPhoto] = useState<string | null>()
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onUpdate = () => {
@@ -250,7 +250,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = (e:ProgressEvent<FileReader>) => {
-        setEditPhoto(e.target?.result);
+        setEditPhoto((e.target?.result as string | null) ?? null);
       }
     }
     return;
