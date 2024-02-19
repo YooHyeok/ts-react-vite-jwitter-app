@@ -12,6 +12,22 @@ const Form = styled.form`
   gap: 10px;
 `;
 
+const FirstRow = styled.div`
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  /* padding: 20px; */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 15px;  
+`;
+const Column1 = styled.div`
+`;
+const Column2 = styled.label`
+  width: 150px;
+  min-height: 150px;
+  line-height: 150px;
+  max-height: 150px;
+`;
+
 const TextArea = styled.textarea`
   border: 2px solid white;
   padding: 20px;
@@ -30,6 +46,14 @@ const TextArea = styled.textarea`
     outline: none;
     border-color: #1d9bf0;
   }
+`;
+const Photo = styled.img`
+/* position: relative;
+  top:20px; */
+  /* margin-top: 25px; */
+  width: 150px;
+  height: 150px;
+  border-radius: 15px;
 `;
 
 const AttachFileButton = styled.label`
@@ -70,6 +94,7 @@ export default function PostTweetForm() {
   const [tweet, setTweet] = useState("");
   const [file, setFile] = useState<File|null>(null);
   const [fileError, setFileError] = useState("");
+  const [photo, setPhoto] = useState<string|null>(null);
 
   useEffect(()=>{
     if(fileError !== ""){
@@ -92,7 +117,17 @@ export default function PostTweetForm() {
         return;
       }
       setFile(files[0])
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onload = (e:ProgressEvent<FileReader>) => {
+        setPhoto(e.target?.result);
+      }
     }
+  }
+
+  const onDeletePhoto = () => {
+    setFile(null)
+    setPhoto(null)
   }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,8 +160,17 @@ export default function PostTweetForm() {
     }
   }
   return <Form onSubmit={onSubmit}>
-    <TextArea required rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?"/>
-    <AttachFileButton  htmlFor="file" >{file? "Photo added" : "Add photo"}</AttachFileButton>
+    <FirstRow>
+      <Column1>
+        <TextArea required rows={5} maxLength={180} onChange={onChange} value={tweet} placeholder="What is happening?"/>
+      </Column1>
+      <Column2 htmlFor="file">
+        {
+          photo ? <Photo src={photo} /> : "사진 첨부 클릭"
+        }
+      </Column2>
+    </FirstRow>
+    <AttachFileButton onClick={onDeletePhoto}>{"Init Photo"}</AttachFileButton>
     <AttachFileInput onChange={onFileChange} type="file" id="file" accept="image/*"/>
     {fileError !== "" ? <Error>{fileError}</Error> : null}
     <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post Tweet"}/>
