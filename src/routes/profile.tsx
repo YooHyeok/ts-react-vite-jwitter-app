@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { updateProfile } from "firebase/auth"
 import { Error } from "../components/auth-styled"
-import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { collection, getDocs, limit, onSnapshot, orderBy, query, where } from "firebase/firestore"
 import { ITweet } from "../components/timeline"
 import Tweet from "../components/tweet"
 
@@ -122,7 +122,7 @@ export default function Profile() {
    * 콘솔 오류 출력 링크로 이동하여 색인을 저장한다.
    * 우리가 필터링에 사용한 필터들을 파이어베이스에 직접 알려줘야 한다.
    */
-  const fetchTweet = async () => {
+  /* const fetchTweet = async () => {
 
     const tweetQuery = query(
       collection(db, "tweets"),
@@ -143,10 +143,42 @@ export default function Profile() {
       }
     })
     setTweets(tweets)
+  } */
+  const getTweets = (snapshot: QuerySnapshot<DocumentData>) => {
+    return snapshot.docs.map(doc=>{
+      const{photo, tweet, userId, username, createdAt} = doc.data();
+        return {
+          photo,
+          tweet,
+          userId,
+          username,
+          createdAt,
+          docId: doc.id
+        };
+      })
   }
-
   useEffect(()=> {
-    fetchTweet();
+    // fetchTweet();
+    let unsubscribe: Unsubscribe|null = null;
+    const fetchTweets = async () => {
+      const tweetsQuery = query(
+        collection(db, "tweets"), 
+        orderBy("createdAt", "desc"), //createdAt 기준 내림차순
+        where("userId", "==", user?.uid),
+        limit(25) // 25개의 데이터만 가져와 비용을 절약한다.
+      )
+
+      unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
+        // snapshot으로부터  마지막 스냅샷 이후의 변경사항(크기, 쿼리, 메타데이터, 문서 등)을 볼 수 있다.
+        // snapshot.docChanges // 변경사항 을 배열로 반환한다. (변경사항으로 작업을 분기처리할 수 있음..) 
+        const tweets = getTweets(snapshot)
+          setTweets(tweets)
+      })
+    }
+    fetchTweets();
+    return () => {
+      unsubscribe && unsubscribe();
+    }
   }, [])
 
   /**
