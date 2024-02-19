@@ -35,7 +35,11 @@ const AvatarInput = styled.input`
   display: none;
 `
 const Name = styled.span`
-  font-size: 22px;
+  width: 170px;
+  padding: 5px 0px;
+  font-size: 18px;
+  height: 32px;
+  text-align: center;
 `
 const DefaultAvatarBtn = styled.label`
   width: 30%;
@@ -59,12 +63,46 @@ const Tweets = styled.div`
   overflow-y: scroll;
 `
 
+const EditNickButton = styled.button`
+  background-color: black;
+  float: left;
+  color: tomato;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+  border: 1px solid tomato;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    opacity: 0.9;
+  }
+`
+export const Input = styled.input`
+  width: 170px;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+  text-align: center;
+  padding: 5px 0px;
+  border-radius: 50px;
+  font-size: 17px;
+  &[type="submit"] {/* type이 submit이라면 */
+    cursor: pointer; /* cursor pointer효과 */
+    &:hover { /* hover되었다면 */
+      opacity: 0.8; /* 투명도를 0.8로 지정 */
+    }
+  }
+`
+
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [error, setError] = useState("")
   const [tweets, setTweets] = useState<ITweet[]>([])
-
+  const [nickname, setNickname] = useState(user?.displayName)
+  const [isNickEdit, setIsNickEdit] = useState(false)
   const onAvatarChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
     const {files} = e.target
 
@@ -111,7 +149,6 @@ export default function Profile() {
     fetchTweet();
   }, [])
 
-
   /**
    * 삭제 후 출력되는 메시지 3초후 제거
    */
@@ -136,6 +173,24 @@ export default function Profile() {
     }
   }
 
+  /**
+   * 닉네임 변경
+   * input 비/활 및 변경
+   * @param e 
+   */
+  const onNickHandler = async(e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if(!isNickEdit) setIsNickEdit(!isNickEdit)
+    else if(user && nickname != "" && nickname != user?.displayName){
+      // 사용자 프로필이름 지정
+        await updateProfile(user, {displayName: nickname,})
+      }
+      setIsNickEdit(!isNickEdit)
+  }
+  const onNickChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value)
+  }
+
   return <Wrapper>
     <AvatarUpload htmlFor="profile">
       {Boolean(avatar)? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
@@ -143,9 +198,14 @@ export default function Profile() {
     <AvatarInput onChange={onAvatarChange} id="profile" type="file" accept="image/*"/>
     <DefaultAvatarBtn onClick={onDefaultAvatar}>Change Default Avartar</DefaultAvatarBtn>
     {error !== "" ? <Error>{error}</Error>: null}
-    <Name>
-      {user?.displayName ?? "Anonymous"}
-    </Name>
+    <div style={{display: "flex"}}>
+    {isNickEdit ? 
+    <Input onChange={onNickChange} value={nickname} placeholder={"변경할 닉네임 입력"} maxLength={15} minLength={1}/>
+    :
+    <Name>{user?.displayName ?? "Anonymous"}</Name>
+    }
+    <EditNickButton onClick={onNickHandler}>{isNickEdit ? "✏️ Submit" : "✏️ Edit"}</EditNickButton>
+    </div>
     <Tweets>
       {tweets.map(tweet=> <Tweet key={tweet.docId} {...tweet}/>)}
     </Tweets>
