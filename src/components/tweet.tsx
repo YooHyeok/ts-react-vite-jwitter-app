@@ -1,9 +1,9 @@
 import styled from "styled-components";
 import { ITweet } from "./timeline";
 import { auth, db, storage } from "../routes/firebase";
-import {  doc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import {  useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const Wrapper = styled.div`
   display: grid;
@@ -172,6 +172,22 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
     setEditPhoto(photo)
     setUpdateMode(false);
   }
+  /* 게시글 삭제 */
+  const onDelete = async () => {
+    const ok = confirm("Are you sure you want to delete this tweet?");
+    if (!ok || user?.uid !== userId) return;
+    try {
+      await deleteDoc(doc(db, "tweets", docId));
+      if (photo) {
+        const photoRef = ref(storage, `tweets/${user.uid}/${docId}`);
+        await deleteObject(photoRef);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      //
+    }
+  };
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditTweet(e.target.value)
@@ -181,7 +197,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
    * 삭제 핸들러
    * @returns 
    */
-  const onDelete = async() => {
+  const onPhotoDelete = async() => {
     const ok = confirm("Are you sure you want to delete this?")
     if(!ok) return;
     setEditPhoto(undefined)
@@ -258,19 +274,23 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
         }
       </Column1>
       <Column2>
-        {editPhoto ? 
+        {updateMode ? /* Update모드가 아니면 기존 프로필만 출력 */
         <>
-          <EditPhoto src={editPhoto}/> 
-            {updateMode && 
-            <>
-              <EditPhotoBtn onClick={() => fileInputRef.current?.click()} /* htmlFor="photo" */>Edit</EditPhotoBtn>
-              <DeletePhotoBtn onClick={onDelete} >del</DeletePhotoBtn>
-            </>
-            } 
+          {editPhoto ? 
+          <>
+            <EditPhoto src={editPhoto}/> 
+              {updateMode && 
+              <>
+                <EditPhotoBtn onClick={() => fileInputRef.current?.click()} /* htmlFor="photo" */>Edit</EditPhotoBtn>
+                <DeletePhotoBtn onClick={onPhotoDelete} >del</DeletePhotoBtn>
+              </>
+              } 
+          </>
+          : 
+          updateMode && <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
+          }
         </>
-        : 
-        updateMode && <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
-        }
+        : photo? <EditPhoto src={photo}/> : null }
 
       </Column2>
       <AttachFileInput ref={fileInputRef} onChange={onPhotoChange} type="file" id="photo" accept="image/*"/>
