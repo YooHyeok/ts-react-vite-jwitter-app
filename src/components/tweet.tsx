@@ -232,8 +232,8 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
         url = await getDownloadURL(result.ref);
       }
 
-      if(!editPhoto) url = "" // 삭제
-
+      if(editPhoto == null) url = "" // 사진 삭제
+      
       await updateDoc(tweetRef, {photo: url,});
 
     } catch (e) {
