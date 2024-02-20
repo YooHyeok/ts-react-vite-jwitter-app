@@ -166,6 +166,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onUpdate = () => {
+    setEditPhoto(photo)
     setUpdateMode(true);
   }
   const onCancel = () => {
@@ -278,7 +279,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
         <>
           {editPhoto ? 
           <>
-            <EditPhoto src={editPhoto}/> 
+            <EditPhoto src={editPhoto}/>
               {updateMode && 
               <>
                 <EditPhotoBtn onClick={() => fileInputRef.current?.click()} /* htmlFor="photo" */>Edit</EditPhotoBtn>
