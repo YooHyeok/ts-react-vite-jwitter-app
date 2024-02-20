@@ -163,6 +163,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   const [editTweet, setEditTweet] = useState(tweet);
   const [editFile, setEditFile] = useState<File|null>(null)
   const [editPhoto, setEditPhoto] = useState<string | null>()
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onUpdate = () => {
@@ -194,17 +195,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
     setEditTweet(e.target.value)
   }
 
-  /**
-   * 삭제 핸들러
-   * @returns 
-   */
-  const onPhotoDelete = async() => {
-    const ok = confirm("Are you sure you want to delete this?")
-    if(!ok) return;
-    setEditPhoto(undefined)
-    setEditFile(null)
-  }
-  
+ 
   /**
    * 수정 후 저장 핸들러
    * @param e 
@@ -214,7 +205,7 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user || editTweet === "" || editTweet.length > 180) return;
-
+    
     try {
       /* 내용 */
       const tweetRef = doc(db, "tweets", docId);
@@ -224,16 +215,21 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
 
       let url = null;
       /* 이미지 */
-      if (editFile && editPhoto) {// 수정/추가
+      if (editFile && editPhoto != photo) {// [수정/추가] - 수정내역이 있고, src가 같지 않으면 
         const originRef = ref(storage, `tweets/${user.uid}/${docId}`);
         if(photo) await deleteObject(originRef); // 사진이 존재하면 storage에서 사진 삭제
         const locationRef = ref(storage, `tweets/${user.uid}/${docId}`);
         const result = await uploadBytes(locationRef, editFile);
         url = await getDownloadURL(result.ref);
-      }
+        setEditFile(null)
 
-      if(editPhoto == null) url = "" // 사진 삭제
-      
+      } else if (!editFile && editPhoto != photo) { // [삭제] - src가 다르고, 수정내역이 없으면
+        url = null;
+
+      } else if (!editFile && editPhoto == photo){ // [유지] 수정내역이 없고 src가 같으면 기존사진
+        url = photo;
+
+      }
       await updateDoc(tweetRef, {photo: url,});
 
     } catch (e) {
@@ -254,8 +250,19 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
         setEditPhoto((e.target?.result as string | null) ?? null);
       }
     }
-    return;
   }
+
+  /**
+   * 삭제 핸들러
+   * @returns 
+   */
+  const onPhotoDelete = async() => {
+    const ok = confirm("Are you sure you want to delete this?")
+    if(!ok) return;
+    setEditPhoto(undefined)
+    setEditFile(null)
+  }
+
   return(
     <Wrapper key={userId}>
       <Column1>
@@ -288,7 +295,8 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
               } 
           </>
           : 
-          updateMode && <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
+          // updateMode && <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
+          <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
           }
         </>
         : photo? <EditPhoto src={photo}/> : null }
