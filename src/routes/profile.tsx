@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { Unsubscribe, updateProfile } from "firebase/auth"
 import { Error } from "../components/auth-styled"
-import { DocumentData, QuerySnapshot, collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore"
+import { DocumentData, QuerySnapshot, collection, doc, getDocs, limit, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore"
 import { ITweet } from "../components/timeline"
 import Tweet from "../components/tweet"
 
@@ -180,7 +180,6 @@ export default function Profile() {
       unsubscribe && unsubscribe();
     }
   }, [])
-
   /**
    * 삭제 후 출력되는 메시지 3초후 제거
    */
@@ -216,9 +215,24 @@ export default function Profile() {
     else if(user && nickname != "" && nickname != user?.displayName){
       // 사용자 프로필이름 지정
         await updateProfile(user, {displayName: nickname,})
-      }
-      setIsNickEdit(!isNickEdit)
+        
+    }
+    setIsNickEdit(!isNickEdit)
+
+    const updateUserProfileArticleQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    )
+      const snapshot = await getDocs(updateUserProfileArticleQuery);
+      snapshot.docs.forEach(document => {
+        // const {id} = doc.data();
+        const updateUserProfileDoc = doc(db, "tweets", document.id);
+        updateDoc(updateUserProfileDoc, {username: nickname})
+      })
   }
+
   const onNickChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNickname(e.target.value)
   }
