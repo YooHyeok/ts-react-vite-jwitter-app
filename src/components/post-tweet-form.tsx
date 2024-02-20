@@ -153,6 +153,7 @@ export default function PostTweetForm() {
       }
       setTweet("")
       setFile(null)
+      setPhoto(null)
     } catch(e) {
       console.log(e)
     } finally {
