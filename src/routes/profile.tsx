@@ -179,7 +179,7 @@ export default function Profile() {
     return () => {
       unsubscribe && unsubscribe();
     }
-  }, [])
+  })
   /**
    * 삭제 후 출력되는 메시지 3초후 제거
    */
