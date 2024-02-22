@@ -7,6 +7,7 @@ import { Unsubscribe } from "firebase/auth";
 
 export interface ITweet {
   docId: string;
+  avatar?: string;
   photo?: string; //사진은 필수가 아니므로 ?처리
   tweet: string;
   userId: string;
@@ -42,8 +43,9 @@ export default function Timeline() {
 
   const getTweets = (snapshot: QuerySnapshot<DocumentData>) => {
     return snapshot.docs.map(doc=>{
-      const{photo, tweet, userId, username, createdAt} = doc.data();
+      const{avatar, photo, tweet, userId, username, createdAt} = doc.data();
         return {
+          avatar,
           photo,
           tweet,
           userId,

@@ -31,10 +31,14 @@ const EditPhoto = styled.img`
   height: 115px;
   border-radius: 15px;
 `;
-
+const AvatarImg = styled.img`
+  width: 100%;
+`
 const Username = styled.span`
+  line-height: 20px;
   font-weight: 600;
   font-size: 15px;
+  color : white;
 `;
 
 const Payload = styled.p`
@@ -157,7 +161,26 @@ const DeletePhotoBtn = styled.label`
   }
 `
 
-export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
+const ProfileArea = styled.div`
+display: grid;
+/* width: 200px; */
+grid-template-columns: 1fr 15fr;
+`;
+
+const PhotoArea = styled.label`
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #1d9bf0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width:50%;
+  }
+`
+export default function Tweet({avatar, photo, tweet, username, userId, docId}: ITweet) {
   const user = auth.currentUser;
   const [updateMode, setUpdateMode] = useState(false);
   const [editTweet, setEditTweet] = useState(tweet);
@@ -266,7 +289,15 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
   return(
     <Wrapper key={userId}>
       <Column1>
-        <Username>{username}</Username>
+      {/* {avatar? <AvatarImg src={avatar}/> : <DefaultAvatar/>} */}
+        
+        <ProfileArea>
+          <PhotoArea>
+           {avatar && avatar != ""? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
+            {/* {!avatar && <DefaultAvatar/>} */}
+          </PhotoArea>
+          <Username>{username}</Username>
+        </ProfileArea>
         {updateMode ? 
         <Form onSubmit={onEditSubmit}>
         <TextArea required rows={5} maxLength={180} value={editTweet} onChange={onChange} placeholder="What is happening?"/>
@@ -305,4 +336,9 @@ export default function Tweet({photo, tweet, username, userId, docId}: ITweet) {
       <AttachFileInput ref={fileInputRef} onChange={onPhotoChange} type="file" id="photo" accept="image/*"/>
     </Wrapper>
   );
+}
+function DefaultAvatar() {
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+  <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+</svg>
 }

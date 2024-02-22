@@ -30,6 +30,7 @@ const AvatarUpload = styled.label`
 `
 const AvatarImg = styled.img`
   width: 100%;
+  object-fit: cover;
 `
 const AvatarInput = styled.input`
   display: none;
@@ -103,6 +104,20 @@ export default function Profile() {
   const [tweets, setTweets] = useState<ITweet[]>([])
   const [nickname, setNickname] = useState<string|null|undefined>(user?.displayName)
   const [isNickEdit, setIsNickEdit] = useState(false)
+
+  /**
+   * 프로필/닉네임 수정시 해당 user에 대한 모든 게시글을 조회한다.
+   * @returns 
+   */
+  const updateUserProfileArticleQuery = () => {
+    return query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    )
+  }
+
   const onAvatarChange = async (e:React.ChangeEvent<HTMLInputElement>) => {
     const {files} = e.target
 
@@ -114,6 +129,13 @@ export default function Profile() {
 
       setAvatar(photoURL)
       await updateProfile(user, {photoURL})
+
+      const snapshot = await getDocs(updateUserProfileArticleQuery());
+      snapshot.docs.forEach(document => {
+        // const {id} = doc.data();
+        const updateUserProfileDoc = doc(db, "tweets", document.id);
+        updateDoc(updateUserProfileDoc, {avatar: photoURL})
+      })
     }
   }
 
@@ -144,10 +166,12 @@ export default function Profile() {
     })
     setTweets(tweets)
   } */
+
   const getTweets = (snapshot: QuerySnapshot<DocumentData>) => {
     return snapshot.docs.map(doc=>{
-      const{photo, tweet, userId, username, createdAt} = doc.data();
+      const{avatar, photo, tweet, userId, username, createdAt} = doc.data();
         return {
+          avatar,
           photo,
           tweet,
           userId,
@@ -179,7 +203,8 @@ export default function Profile() {
     return () => {
       unsubscribe && unsubscribe();
     }
-  })
+  }, [])
+
   /**
    * 삭제 후 출력되는 메시지 3초후 제거
    */
@@ -201,6 +226,12 @@ export default function Profile() {
       const photoRef = ref(storage,  `avatars/${user?.uid}`)
       await deleteObject(photoRef)
       await updateProfile(user, {photoURL:""})
+      const snapshot = await getDocs(updateUserProfileArticleQuery());
+      
+      snapshot.docs.forEach(document => {
+        const updateUserProfileDoc = doc(db, "tweets", document.id);
+        updateDoc(updateUserProfileDoc, {avatar: ""})
+      })
     }
   }
 
@@ -219,13 +250,7 @@ export default function Profile() {
     }
     setIsNickEdit(!isNickEdit)
 
-    const updateUserProfileArticleQuery = query(
-      collection(db, "tweets"),
-      where("userId", "==", user?.uid),
-      orderBy("createdAt", "desc"),
-      limit(25)
-    )
-      const snapshot = await getDocs(updateUserProfileArticleQuery);
+      const snapshot = await getDocs(updateUserProfileArticleQuery());
       snapshot.docs.forEach(document => {
         // const {id} = doc.data();
         const updateUserProfileDoc = doc(db, "tweets", document.id);
