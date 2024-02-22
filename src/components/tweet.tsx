@@ -200,7 +200,7 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId, cr
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const createdAtFormat = (createdAt: string) => {
+  const createdAtFormat = (createdAt: number) => {
     /* const date = new Date(createdAt);
 
     const options: Intl.DateTimeFormatOptions = {
