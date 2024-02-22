@@ -4,6 +4,7 @@ import { auth, db, storage } from "../routes/firebase";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useRef, useState } from "react";
+import Fancybox from "./fancybox";
 
 const Wrapper = styled.div`
   display: grid;
@@ -16,12 +17,9 @@ const Wrapper = styled.div`
 const Column1 = styled.div`
 `;
 const Column2 = styled.div`
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* align-items: ; */
+    margin-top: 25px;
     width: 115px;
     height: 115px;
-  /* gap: 5px; */
 `;
 
 const AvatarImg = styled.img`
@@ -30,9 +28,6 @@ const AvatarImg = styled.img`
   object-fit: cover; 
 `
 const EditPhoto = styled.img`
-/* position: relative;
-  top:20px; */
-  margin-top: 25px;
   border-radius: 15px;
   width: 100%;
   height: 100%;
@@ -358,20 +353,36 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId, cr
         <>
           {editPhoto ? 
           <>
-            <EditPhoto src={editPhoto}/>
-              {updateMode && 
-              <>
-                <EditPhotoBtn onClick={() => fileInputRef.current?.click()} /* htmlFor="photo" */>Edit</EditPhotoBtn>
-                <DeletePhotoBtn onClick={onPhotoDelete} >del</DeletePhotoBtn>
-              </>
-              } 
+            <Fancybox
+              options={{
+                Carousel: {
+                  infinite: false,
+                },
+              }}
+            >
+            <a href={editPhoto} data-fancybox data-caption="Single image"><EditPhoto src={editPhoto}/></a>
+            </Fancybox>
+            {updateMode && 
+            <>
+              <EditPhotoBtn onClick={() => fileInputRef.current?.click()} /* htmlFor="photo" */>Edit</EditPhotoBtn>
+              <DeletePhotoBtn onClick={onPhotoDelete} >del</DeletePhotoBtn>
+            </>
+            } 
           </>
           : 
           // updateMode && <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
           <AddPhotoBtn onClick={() => fileInputRef.current?.click()}>Add</AddPhotoBtn> 
           }
         </>
-        : photo? <EditPhoto src={photo}/> : null }
+        : photo? 
+        <Fancybox
+            options={{
+              Carousel: {
+                infinite: false,
+              },
+            }}
+          ><a href={photo} data-fancybox data-caption="Single image"><EditPhoto src={photo}/></a>
+          </Fancybox> : null }
 
       </Column2>
       <AttachFileInput ref={fileInputRef} onChange={onPhotoChange} type="file" id="photo" accept="image/*"/>
