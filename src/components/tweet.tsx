@@ -41,6 +41,13 @@ const Username = styled.span`
   color : white;
 `;
 
+const CreatedAt = styled.span`
+  line-height: 20px;
+  font-weight: 600;
+  font-size: 15px;
+  color : gray;
+`;
+
 const Payload = styled.p`
   margin: 10px 0px;
   min-height: 108px;
@@ -180,7 +187,7 @@ const PhotoArea = styled.label`
     width:50%;
   }
 `
-export default function Tweet({avatar, photo, tweet, username, userId, docId}: ITweet) {
+export default function Tweet({avatar, photo, tweet, username, userId, docId, createdAt}: ITweet) {
   const user = auth.currentUser;
   const [updateMode, setUpdateMode] = useState(false);
   const [editTweet, setEditTweet] = useState(tweet);
@@ -188,6 +195,37 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId}: I
   const [editPhoto, setEditPhoto] = useState<string | null>()
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const createdAtFormat = (createdAt: string) => {
+    /* const date = new Date(createdAt);
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false, // 24시간 형식
+    };
+
+    const format = date.toLocaleDateString('ko-KR', options)
+    .replace(/\./g, '').replace(/ /g, '.')
+    const lastDotIndex = format.lastIndexOf('.');
+    return `${format.slice(0, lastDotIndex)} ${format.slice(lastDotIndex + 1)}`; */
+
+    const date = new Date(createdAt);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const formattedDate = `${year}.${month}.${day}`;
+
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const formattedTime = `${hours}:${minutes}`;
+
+    return `${formattedDate} ${formattedTime}`;
+
+  }
 
   const onUpdate = () => {
     setEditPhoto(photo)
@@ -289,14 +327,13 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId}: I
   return(
     <Wrapper key={userId}>
       <Column1>
-      {/* {avatar? <AvatarImg src={avatar}/> : <DefaultAvatar/>} */}
         
         <ProfileArea>
           <PhotoArea>
-           {avatar && avatar != ""? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
-            {/* {!avatar && <DefaultAvatar/>} */}
+           {avatar && avatar != "" ? <AvatarImg src={avatar}/> : <DefaultAvatar/>}
           </PhotoArea>
-          <Username>{username}</Username>
+          {/* <div><Username>{username}</Username>{' '}<CreatedAt>{createdAt}</CreatedAt></div> */}
+          <div><Username>{username}</Username>{' '}<CreatedAt>{createdAtFormat(createdAt)}</CreatedAt></div>
         </ProfileArea>
         {updateMode ? 
         <Form onSubmit={onEditSubmit}>

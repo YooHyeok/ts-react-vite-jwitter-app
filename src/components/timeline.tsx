@@ -41,6 +41,8 @@ export default function Timeline() {
   //   setTweets(tweets)
   // }
 
+
+
   const getTweets = (snapshot: QuerySnapshot<DocumentData>) => {
     return snapshot.docs.map(doc=>{
       const{avatar, photo, tweet, userId, username, createdAt} = doc.data();
