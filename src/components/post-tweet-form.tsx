@@ -141,8 +141,8 @@ export default function PostTweetForm() {
         tweet,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous", // 닉네임이 존재하지 않으면 Anonymous 반환
-        userId: user.uid // 트윗을 삭제하기 위한 작성자와 로그인한 userid일치여부
-
+        userId: user.uid, // 트윗을 삭제하기 위한 작성자와 로그인한 userid일치여부
+        avatar: user?.photoURL
       }) 
       if(file) {
         // const locationRef = ref(storage, `tweets/${user.uid}-${user.displayName}/${doc.id}`)//파일에 대한 저장 위치
