@@ -6,11 +6,19 @@ import { useNavigate } from "react-router-dom";
 const Wrapper = styled.div`
   display: grid;
   gap: 50px;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 8fr;
+  padding: 50px 0px;
+  max-width: 950px;
+`;
+const OutletWrapper = styled.div`
+  width: 81%;
   height: 100%;
   padding: 50px 0px;
-  width: 100%;
-  max-width: 860px;
+`;
+const Navigation = styled.div`
+  width: 30%;
+  height: 100%;
+  padding: 50px 0px;
 `;
 
 const Menu = styled.div`
@@ -50,8 +58,8 @@ export default function Layout() {
     }
   }
   return (
-    <>
-      <Wrapper>
+    <Wrapper>
+      <Navigation>
         <Menu>
           <Link to="/">
             <MenuItem>
@@ -100,8 +108,10 @@ export default function Layout() {
             </MenuItem>
           </Link>
         </Menu>
+      </Navigation>
+      <OutletWrapper>
         <Outlet /> {/* children을 뿌려준다. */}
-      </Wrapper>
-    </>
+      </OutletWrapper>
+    </Wrapper>
   );
 }
