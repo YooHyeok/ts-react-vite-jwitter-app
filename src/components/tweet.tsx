@@ -19,21 +19,25 @@ const Column2 = styled.div`
   /* display: flex; */
   /* flex-direction: column; */
   /* align-items: ; */
-  width: 115px;
+    width: 115px;
+    height: 115px;
   /* gap: 5px; */
 `;
 
+const AvatarImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+`
 const EditPhoto = styled.img`
 /* position: relative;
   top:20px; */
   margin-top: 25px;
-  width: 115px;
-  height: 115px;
   border-radius: 15px;
-`;
-const AvatarImg = styled.img`
   width: 100%;
-`
+  height: 100%;
+  object-fit: cover; 
+`;
 const Username = styled.span`
   line-height: 20px;
   font-weight: 600;
