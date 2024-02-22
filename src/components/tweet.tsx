@@ -360,7 +360,7 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId, cr
                 },
               }}
             >
-            <a href={editPhoto} data-fancybox data-caption="Single image"><EditPhoto src={editPhoto}/></a>
+            <a href={editPhoto} data-fancybox data-caption="Attach image"><EditPhoto src={editPhoto}/></a>
             </Fancybox>
             {updateMode && 
             <>
@@ -381,7 +381,7 @@ export default function Tweet({avatar, photo, tweet, username, userId, docId, cr
                 infinite: false,
               },
             }}
-          ><a href={photo} data-fancybox data-caption="Single image"><EditPhoto src={photo}/></a>
+          ><a href={photo} data-fancybox data-caption="Attach image"><EditPhoto src={photo}/></a>
           </Fancybox> : null }
 
       </Column2>
