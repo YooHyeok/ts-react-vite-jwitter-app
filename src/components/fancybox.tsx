@@ -23,7 +23,6 @@ export interface Avatar {
  */
 function Fancybox(props: Avatar) {
   const containerRef = useRef(null);
-  console.log(props)
   useEffect(() => {
     const container = containerRef.current;
 

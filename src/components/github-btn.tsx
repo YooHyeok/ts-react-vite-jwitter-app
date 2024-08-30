@@ -41,7 +41,7 @@ export default function GithubButton() {
       navigate("/")
     } catch (e) {
       if(e instanceof FirebaseError) { // 로그인 실패시
-        console.log(e.code, e.message)
+        // console.log(e.code, e.message)
         setError(e.message)
       }
     }

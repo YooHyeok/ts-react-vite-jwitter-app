@@ -30,7 +30,7 @@ export default function Login() {
       navigate("/")
     } catch (e) {
       if(e instanceof FirebaseError) { // 로그인 실패시
-        console.log(e.code, e.message)
+        // console.log(e.code, e.message)
         setError(e.message)
       }
     } finally { // navigate에 의해 리다이렉트 되었더라도 무조건 실행된다.
