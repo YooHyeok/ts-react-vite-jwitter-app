@@ -22,6 +22,7 @@ const Navigation = styled.div`
 `;
 
 const Menu = styled.div`
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
