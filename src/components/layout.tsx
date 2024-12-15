@@ -90,7 +90,7 @@ export default function Layout() {
               </svg>
             </MenuItem>
           </Link>
-          <Link to="https://github.com/YooHyeok" target="_blank">
+          <Link to="https://github.com/YooHyeok" title="제작자 깃허브" target="_blank">
             <MenuItem>
               <svg 
                 xmlns="http://www.w3.org/2000/svg"
