@@ -166,6 +166,22 @@ b. 프로젝트 초기화
   - 빌드 실행 `npm run build` 명령 입력
   
   c. dist 디렉토리 생성 확인 후 `firebase deploy` 명령 입력
+  
+  d. 빌드 및 배포 연동 script  
+  - package.json  
+    ```json
+    {
+      "scripts": {
+        /* 생략 */
+        "predeploy": "npm run build",
+        "deploy": "firebase deploy"
+        /* 생략 */
+      },
+    }
+    ```
+    ```bash
+    npm run deploye
+    ```
 </details>
 
 8. ### `콘솔로 이동` 클릭 후 도메인 확인
